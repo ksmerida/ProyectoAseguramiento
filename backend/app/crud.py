@@ -121,69 +121,59 @@ def delete_customer(db: Session, customer_id: uuid.UUID):
 
 
 # ----------------------------
-# Tables CRUD
+# Tables - Tables Status CRUD
 # ----------------------------
-def create_table(db: Session, table: schemas.TableCreate):
-    db_table = models.Table(**table.dict())
+# Crear mesa y estado inicial
+def create_table(db: Session, table_data: schemas.TableCreate):
+    # Crear mesa
+    db_table = models.Table(**table_data.dict())
     db.add(db_table)
     db.commit()
     db.refresh(db_table)
-    return db_table
 
-def get_tables(db: Session) -> List[models.Table]:
-    return db.query(models.Table).filter(models.Table.is_active == True).all()
-
-def get_table(db: Session, table_id: uuid.UUID):
-    return db.query(models.Table).filter(models.Table.id == table_id).first()
-
-def update_table(db: Session, table_id: uuid.UUID, table_data: schemas.TableCreate):
-    db_table = get_table(db, table_id)
-    if db_table:
-        for key, value in table_data.dict(exclude_unset=True).items():
-            setattr(db_table, key, value)
-        db.commit()
-        db.refresh(db_table)
-    return db_table
-
-def delete_table(db: Session, table_id: uuid.UUID):
-    db_table = get_table(db, table_id)
-    if db_table:
-        db_table.is_active = False
-        db.commit()
-    return db_table
-
-
-# ----------------------------
-# TableStatus CRUD
-# ----------------------------
-def create_table_status(db: Session, table_status: schemas.TableStatusCreate):
-    db_status = models.TableStatus(**table_status.dict())
+    # Crear estado inicial 'free' en table_status
+    db_status = models.TableStatus(
+        table_id=db_table.id,
+        status="free"
+    )
     db.add(db_status)
     db.commit()
     db.refresh(db_status)
-    return db_status
 
-def get_table_status(db: Session) -> List[models.TableStatus]:
-    return db.query(models.TableStatus).all()
+    # Devolver mesa con estado combinado
+    return schemas.TableWithStatus(
+        id=db_table.id,
+        code=db_table.code,
+        seats=db_table.seats,
+        location=db_table.location,
+        is_active=db_table.is_active,
+        created_at=db_table.created_at,
+        status=db_status.status,
+        status_id=db_status.id
+    )
 
-def get_table_status_by_id(db: Session, status_id: uuid.UUID):
-    return db.query(models.TableStatus).filter(models.TableStatus.id == status_id).first()
+# ----------------------------
+# Obtener mesas con su estado
+# ----------------------------
+def get_tables_with_status(db: Session):
+    tables = db.query(models.Table).filter(models.Table.is_active == True).all()
+    statuses = db.query(models.TableStatus).all()
 
-def update_table_status(db: Session, status_id: uuid.UUID, status_data: schemas.TableStatusCreate):
-    db_status = get_table_status_by_id(db, status_id)
-    if db_status:
-        for key, value in status_data.dict(exclude_unset=True).items():
-            setattr(db_status, key, value)
-        db.commit()
-        db.refresh(db_status)
-    return db_status
-
-def delete_table_status(db: Session, status_id: uuid.UUID):
-    db_status = get_table_status_by_id(db, status_id)
-    if db_status:
-        db.delete(db_status)
-        db.commit()
-    return db_status
+    result = []
+    for table in tables:
+        status_obj = next((s for s in statuses if s.table_id == table.id), None)
+        table_with_status = schemas.TableWithStatus(
+            id=table.id,
+            code=table.code,
+            seats=table.seats,
+            location=table.location,
+            is_active=table.is_active,
+            created_at=table.created_at,
+            status=status_obj.status if status_obj else "free",
+            status_id=status_obj.id if status_obj else None
+        )
+        result.append(table_with_status)
+    return result
 
 # ----------------------------
 # Reservations CRUD

@@ -74,13 +74,15 @@ class TableBase(BaseModel):
 class TableCreate(TableBase):
     pass
 
-class Table(TableBase):
+class TableWithStatus(TableBase):
     id: uuid.UUID
     is_active: bool
-    created_at: Optional[datetime]
+    created_at: datetime
+    status: str
+    status_id: Optional[uuid.UUID]
 
     class Config:
-        from_attributes = True
+        from_attributes = True  # Pydantic V2
 
 # ----------------------------
 # Table Status
