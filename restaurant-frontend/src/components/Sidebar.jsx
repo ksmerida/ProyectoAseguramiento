@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const menuByRole = {
   admin: [
@@ -24,19 +25,18 @@ const menuByRole = {
   ],
 };
 
-export default function Sidebar() {
+export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user")) || {};
-
   const roleMapping = {
     Administrador: "admin",
     Mesero: "mesero",
     Cocina: "cocina",
     Cajero: "cajero",
   };
-
   const roleFromUser = user.role || "mesero";
   const role = roleMapping[roleFromUser] || "mesero";
 
@@ -47,35 +47,84 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-64 bg-gray-800 text-white min-h-screen p-4 flex flex-col">
-      <div className="mb-6">
-        <h1>Dashboard</h1>
-        <h2 className="text-lg font-bold">{user.username || "Usuario"}</h2>
-        <p className="text-sm text-gray-300">{roleFromUser.toUpperCase()}</p>
-        <button
-          onClick={handleLogout}
-          className="mt-3 w-full bg-red-500 py-1 rounded hover:bg-red-600 text-white text-sm"
-        >
-          Cerrar sesión
-        </button>
-      </div>
+    <header
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        background: "#D32F2F", // rojo principal
+        padding: "10px 30px",
+        color: "#FFF8E1",
+        fontFamily: "'Montserrat', sans-serif",
+        boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
+      }}
+    >
+      {/* Logo */}
+      <div style={{ fontWeight: "bold", fontSize: "22px" }}>Sabor a Guatemala</div>
 
-      <nav className="flex-1 space-y-2">
-        {menuByRole[role]?.map((item) => {
+      {/* Menú horizontal con animación underline */}
+      <nav style={{ display: "flex", gap: "20px" }}>
+        {menuByRole[role]?.map((item, idx) => {
           const isActive = location.pathname === item.path;
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`block py-2 px-3 rounded hover:bg-gray-700 ${
-                isActive ? "bg-gray-700 font-semibold" : ""
-              }`}
+              onMouseEnter={() => setHoveredIndex(idx)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              style={{
+                position: "relative",
+                padding: "8px 0",
+                textDecoration: "none",
+                fontWeight: isActive ? 700 : 500,
+                color: "#FFF8E1",
+                transition: "color 0.3s ease",
+              }}
             >
               {item.label}
+
+              {/* Línea animada */}
+              <span
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  bottom: 0,
+                  height: "3px",
+                  width: isActive || hoveredIndex === idx ? "100%" : "0%",
+                  background: "#FBC02D", // dorado
+                  transition: "width 0.3s ease",
+                  borderRadius: "2px",
+                }}
+              />
             </Link>
           );
         })}
       </nav>
-    </div>
+
+      {/* Usuario y logout */}
+      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+        <span style={{ fontWeight: 600 }}>{user.username || "Usuario"}</span>
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: "6px 12px",
+            borderRadius: "6px",
+            backgroundColor: "#F57C00",
+            color: "#FFF8E1",
+            border: "none",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = "#FFD700")}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = "#F57C00")}
+        >
+          Cerrar sesión
+        </button>
+      </div>
+    </header>
   );
 }

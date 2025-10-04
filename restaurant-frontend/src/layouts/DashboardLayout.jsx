@@ -2,13 +2,22 @@ import React from "react";
 import { Link, Outlet } from "react-router-dom";
 
 export default function DashboardLayout() {
+  // Paleta sin azul
+  const colors = {
+    rojo: "#D32F2F",
+    naranja: "#F57C00",
+    amarillo: "#FBC02D",
+    verde: "#388E3C",
+    beige: "#FFF8E1",
+  };
+
+  // Sidebar
   const sidebarStyle = {
     width: 240,
     minHeight: "100vh",
-    background: "linear-gradient(180deg, #0055A4 0%, #FFD700 100%)", // azul guatemalteco → dorado
-    color: "#fff",
+    background: `linear-gradient(180deg, ${colors.amarillo} 0%, ${colors.beige} 100%)`,
+    color: "#000",
     padding: "30px 20px",
-    boxShadow: "3px 0 10px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
@@ -26,48 +35,73 @@ export default function DashboardLayout() {
   const linkStyle = {
     display: "block",
     padding: "12px 16px",
-    color: "#fff",
+    color: "#000",
     textDecoration: "none",
     fontWeight: 500,
     borderRadius: 8,
     marginBottom: 8,
     transition: "all 0.2s ease",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
   };
 
   const linkHoverStyle = {
-    background: "#C41E3A", // rojo tradicional guatemalteco
+    background: colors.rojo,
     color: "#fff",
     transform: "translateX(5px)",
     boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
   };
 
+  // Main
   const mainStyle = {
     flex: 1,
-    padding: "30px",
-    background: "#F5F5F5",
+    background: colors.beige,
     minHeight: "100vh",
-    boxShadow: "inset 0 0 10px rgba(0,0,0,0.05)",
     overflowY: "auto",
     fontFamily: "'Montserrat', sans-serif",
+    display: "flex",
+    flexDirection: "column",
   };
 
+  // Header
+  const headerStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "20px 30px",
+    background: colors.naranja,
+    color: "#fff",
+    fontWeight: 600,
+    fontSize: 18,
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  };
+
+  // Logout button
   const logoutButtonStyle = {
-    padding: "10px 20px",
-    background: "linear-gradient(90deg, #C41E3A 0%, #FF7043 100%)",
+    padding: "8px 16px",
+    background: colors.rojo,
     color: "#fff",
     border: "none",
-    borderRadius: 8,
+    borderRadius: 6,
     cursor: "pointer",
     fontWeight: 600,
     transition: "all 0.2s ease",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
   };
 
   const logoutHoverStyle = {
-    background: "linear-gradient(90deg, #FF7043 0%, #C41E3A 100%)",
+    background: colors.naranja,
     transform: "scale(1.05)",
   };
+
+  const menuItems = [
+    { path: "users", label: "Usuarios" },
+    { path: "roles", label: "Roles" },
+    { path: "customers", label: "Clientes" },
+    { path: "tables", label: "Mesas" },
+    { path: "menu_items", label: "Ítems de Menú" },
+    { path: "menu-categories", label: "Categorías de Menú" },
+    { path: "inventory", label: "Inventario" },
+    { path: "recipes", label: "Recetas" },
+    { path: "orders", label: "Órdenes" },
+  ];
 
   return (
     <div style={{ display: "flex" }}>
@@ -76,15 +110,7 @@ export default function DashboardLayout() {
           <div style={logoStyle}>Restaurant GT</div>
           <nav>
             <ul style={{ listStyle: "none", padding: 0 }}>
-              {[
-                { path: "users", label: "Usuarios" },
-                { path: "roles", label: "Roles" },
-                { path: "customers", label: "Clientes" },
-                { path: "tables", label: "Mesas" },
-                { path: "menu_items", label: "Menú" },
-                { path: "inventory", label: "Inventario" },
-                { path: "orders", label: "Órdenes" },
-              ].map(({ path, label }) => (
+              {menuItems.map(({ path, label }) => (
                 <li key={path}>
                   <Link
                     to={`/${path}`}
@@ -114,7 +140,14 @@ export default function DashboardLayout() {
       </aside>
 
       <main style={mainStyle}>
-        <Outlet />
+        <div style={headerStyle}>
+          <span>Dashboard</span>
+          <span>ADMINISTRADOR</span>
+        </div>
+
+        <div style={{ padding: 20, flex: 1 }}>
+          <Outlet />
+        </div>
       </main>
     </div>
   );
