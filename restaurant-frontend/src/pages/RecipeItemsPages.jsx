@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getRecipeItems,
@@ -8,6 +8,7 @@ import {
   getMenuItems,
   getInventory
 } from "../api/recipeItems";
+import { colors } from "../theme";
 
 export default function RecipeItemsPage() {
   const queryClient = useQueryClient();
@@ -19,25 +20,16 @@ export default function RecipeItemsPage() {
   const [unit, setUnit] = useState("");
   const [editingItem, setEditingItem] = useState(null);
 
-  // Fetch menu items y inventory para selects
+  // Fetch menu items y inventory
   const { data: menuItems = [] } = useQuery({ queryKey: ["menuItems"], queryFn: getMenuItems });
   const { data: inventory = [] } = useQuery({ queryKey: ["inventory"], queryFn: getInventory });
 
   // Fetch recipe items
-  const { data: recipeItems = [], isLoading } = useQuery({
-    queryKey: ["recipeItems"],
-    queryFn: getRecipeItems
-  });
+  const { data: recipeItems = [], isLoading } = useQuery({ queryKey: ["recipeItems"], queryFn: getRecipeItems });
 
   // Mutation create/update
   const mutation = useMutation({
-    mutationFn: (data) => {
-      if (editingItem) {
-        return updateRecipeItem(editingItem.id, data);
-      } else {
-        return createRecipeItem({ ...data, is_active: true });
-      }
-    },
+    mutationFn: (data) => editingItem ? updateRecipeItem(editingItem.id, data) : createRecipeItem({ ...data, is_active: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recipeItems"] });
       clearForm();
@@ -60,8 +52,7 @@ export default function RecipeItemsPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!menuItemId || !inventoryId || !quantity) return alert("Todos los campos obligatorios");
-
+    if (!menuItemId || !inventoryId || !quantity) return alert("Todos los campos son obligatorios");
     mutation.mutate({ menu_item_id: menuItemId, inventory_id: inventoryId, quantity, unit });
   };
 
@@ -82,18 +73,26 @@ export default function RecipeItemsPage() {
   if (isLoading) return <div>Cargando Recipe Items...</div>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Recipe Items</h1>
+    <div style={{ padding: "20px", backgroundColor: colors.cream, minHeight: "100vh" }}>
+      <h1 style={{ color: colors.darkText }}>Recipe Items</h1>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <select value={menuItemId} onChange={(e) => setMenuItemId(e.target.value)} style={{ marginRight: "10px" }}>
+        <select
+          value={menuItemId}
+          onChange={(e) => setMenuItemId(e.target.value)}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
+        >
           <option value="">Selecciona un menú</option>
           {menuItems.map((m) => (
             <option key={m.id} value={m.id}>{m.name}</option>
           ))}
         </select>
 
-        <select value={inventoryId} onChange={(e) => setInventoryId(e.target.value)} style={{ marginRight: "10px" }}>
+        <select
+          value={inventoryId}
+          onChange={(e) => setInventoryId(e.target.value)}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
+        >
           <option value="">Selecciona un inventario</option>
           {inventory.map((i) => (
             <option key={i.id} value={i.id}>{i.item_name}</option>
@@ -105,7 +104,7 @@ export default function RecipeItemsPage() {
           placeholder="Cantidad"
           value={quantity}
           onChange={(e) => setQuantity(Number(e.target.value))}
-          style={{ marginRight: "10px", width: "80px" }}
+          style={{ marginRight: "10px", width: "80px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
 
         <input
@@ -113,15 +112,41 @@ export default function RecipeItemsPage() {
           placeholder="Unidad"
           value={unit}
           onChange={(e) => setUnit(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
 
-        <button type="submit">{editingItem ? "Actualizar" : "Agregar"}</button>
-        {editingItem && <button type="button" onClick={clearForm} style={{ marginLeft: "10px" }}>Cancelar</button>}
+        <button
+          type="submit"
+          style={{
+            backgroundColor: colors.jadeGreen,
+            color: "#FFF",
+            padding: "6px 12px",
+            borderRadius: "4px",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          {editingItem ? "Actualizar" : "Agregar"}
+        </button>
+        {editingItem && (
+          <button
+            type="button"
+            onClick={clearForm}
+            style={{
+              marginLeft: "10px",
+              padding: "6px 12px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              cursor: "pointer"
+            }}
+          >
+            Cancelar
+          </button>
+        )}
       </form>
 
-      <table border="1" cellPadding="5" cellSpacing="0">
-        <thead>
+      <table border="1" cellPadding="5" cellSpacing="0" style={{ width: "100%", backgroundColor: "#FFF", borderRadius: "4px" }}>
+        <thead style={{ backgroundColor: colors.accentOrange, color: "#FFF" }}>
           <tr>
             <th>Menu Item</th>
             <th>Inventory</th>
@@ -138,8 +163,33 @@ export default function RecipeItemsPage() {
               <td>{item.quantity}</td>
               <td>{item.unit}</td>
               <td>
-                <button onClick={() => handleEdit(item)}>Editar</button>
-                <button onClick={() => handleDelete(item.id)} style={{ marginLeft: "5px" }}>Eliminar</button>
+                <button
+                  onClick={() => handleEdit(item)}
+                  style={{
+                    backgroundColor: colors.jadeGreen,
+                    color: "#FFF",
+                    border: "none",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  style={{
+                    marginLeft: "5px",
+                    backgroundColor: colors.primaryRed,
+                    color: "#FFF",
+                    border: "none",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Eliminar
+                </button>
               </td>
             </tr>
           ))}

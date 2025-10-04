@@ -1,30 +1,24 @@
-// RolesPage.jsx
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getRoles, createRole, updateRole, deleteRole } from "../api/roles";
+import { colors } from "../theme";
 
 export default function RolesPage() {
   const queryClient = useQueryClient();
 
-  // Form state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [editingRole, setEditingRole] = useState(null);
 
-  // Fetch roles
   const { data: roles = [], isLoading } = useQuery({
     queryKey: ["roles"],
     queryFn: getRoles,
   });
 
-  // Create / Update role
   const mutation = useMutation({
     mutationFn: (roleData) => {
-      if (editingRole) {
-        return updateRole(editingRole.id, roleData);
-      } else {
-        return createRole({ ...roleData, is_active: true }); // por defecto true al crear
-      }
+      if (editingRole) return updateRole(editingRole.id, roleData);
+      return createRole({ ...roleData, is_active: true });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
@@ -32,7 +26,6 @@ export default function RolesPage() {
     },
   });
 
-  // Delete role (lógico)
   const deleteMutation = useMutation({
     mutationFn: (roleId) => deleteRole(roleId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["roles"] }),
@@ -46,10 +39,7 @@ export default function RolesPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name) {
-      alert("El nombre del rol es obligatorio");
-      return;
-    }
+    if (!name) return alert("El nombre del rol es obligatorio");
     mutation.mutate({ name, description });
   };
 
@@ -68,50 +58,99 @@ export default function RolesPage() {
   if (isLoading) return <div>Cargando roles...</div>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Roles</h1>
+    <div style={{ padding: "20px", backgroundColor: colors.cream, minHeight: "100vh" }}>
+      <h1 style={{ color: colors.darkText }}>Roles</h1>
 
+      {/* Formulario */}
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
         <input
           type="text"
           placeholder="Nombre del rol"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="text"
           placeholder="Descripción"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
-        <button type="submit">{editingRole ? "Actualizar" : "Agregar"}</button>
+        <button
+          type="submit"
+          style={{
+            backgroundColor: colors.primaryRed,
+            color: "#FFF",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          {editingRole ? "Actualizar" : "Agregar"}
+        </button>
         {editingRole && (
-          <button type="button" onClick={clearForm} style={{ marginLeft: "10px" }}>
+          <button
+            type="button"
+            onClick={clearForm}
+            style={{
+              marginLeft: "10px",
+              backgroundColor: colors.cream,
+              border: `1px solid ${colors.primaryRed}`,
+              color: colors.primaryRed,
+              padding: "8px 12px",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
             Cancelar
           </button>
         )}
       </form>
 
-      <table border="1" cellPadding="5" cellSpacing="0">
-        <thead>
+      {/* Tabla */}
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead style={{ backgroundColor: colors.jadeGreen, color: "#FFF" }}>
           <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Acciones</th>
+            <th style={{ padding: "8px" }}>Nombre</th>
+            <th style={{ padding: "8px" }}>Descripción</th>
+            <th style={{ padding: "8px" }}>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {roles
-            .filter(r => r.is_active)
+            .filter((r) => r.is_active)
             .map((r) => (
-              <tr key={r.id}>
-                <td>{r.name}</td>
-                <td>{r.description}</td>
-                <td>
-                  <button onClick={() => handleEdit(r)}>Editar</button>
-                  <button onClick={() => handleDelete(r.id)} style={{ marginLeft: "5px" }}>
+              <tr key={r.id} style={{ borderBottom: "1px solid #ccc" }}>
+                <td style={{ padding: "8px", color: colors.darkText }}>{r.name}</td>
+                <td style={{ padding: "8px", color: colors.darkText }}>{r.description}</td>
+                <td style={{ padding: "8px" }}>
+                  <button
+                    onClick={() => handleEdit(r)}
+                    style={{
+                      backgroundColor: colors.accentOrange,
+                      color: "#FFF",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      border: "none",
+                      cursor: "pointer",
+                      marginRight: "5px",
+                    }}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(r.id)}
+                    style={{
+                      backgroundColor: colors.primaryRed,
+                      color: "#FFF",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
                     Eliminar
                   </button>
                 </td>

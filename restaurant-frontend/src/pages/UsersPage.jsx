@@ -1,10 +1,10 @@
-// UsersPage.jsx
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUsers, createUser, updateUser, deleteUser } from "../api/users";
 import axios from "axios";
+import { colors } from "../theme";
 
-const apiUrl = "http://localhost:8000"; // Cambiar si tu backend tiene otra URL
+const apiUrl = "http://localhost:8000";
 
 export default function UsersPage() {
   const queryClient = useQueryClient();
@@ -27,7 +27,7 @@ export default function UsersPage() {
       .catch(err => console.error("Error cargando roles:", err));
   }, []);
 
-  // ✅ Fetch users (solo activos)
+  // Fetch users (solo activos)
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
@@ -36,7 +36,7 @@ export default function UsersPage() {
     },
   });
 
-  // ✅ Create / Update user
+  // Create / Update user
   const mutation = useMutation({
     mutationFn: (userData) => {
       if (editingUser) {
@@ -51,13 +51,12 @@ export default function UsersPage() {
     },
   });
 
-  // ✅ Delete user (lógico)
+  // Delete user (lógico)
   const deleteMutation = useMutation({
     mutationFn: (userId) => deleteUser(userId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   });
 
-  // Clear form
   const clearForm = () => {
     setUsername("");
     setEmail("");
@@ -67,7 +66,6 @@ export default function UsersPage() {
     setEditingUser(null);
   };
 
-  // Submit form
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!username || !password || !roleId) {
@@ -100,42 +98,43 @@ export default function UsersPage() {
   if (usersLoading) return <div>Cargando usuarios...</div>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Usuarios</h1>
+    <div style={{ padding: "20px", backgroundColor: colors.cream, minHeight: "100vh" }}>
+      <h1 style={{ color: colors.darkText }}>Usuarios</h1>
 
+      {/* Formulario */}
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="text"
           placeholder="Full Name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <select
           value={roleId}
           onChange={(e) => setRoleId(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         >
           <option value="">Selecciona un rol</option>
           {roles.map((role) => (
@@ -144,34 +143,85 @@ export default function UsersPage() {
             </option>
           ))}
         </select>
-        <button type="submit">{editingUser ? "Actualizar" : "Agregar"}</button>
+        <button
+          type="submit"
+          style={{
+            marginLeft: "10px",
+            backgroundColor: colors.primaryRed,
+            color: "#FFF",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          {editingUser ? "Actualizar" : "Agregar"}
+        </button>
         {editingUser && (
-          <button type="button" onClick={clearForm} style={{ marginLeft: "10px" }}>
+          <button
+            type="button"
+            onClick={clearForm}
+            style={{
+              marginLeft: "10px",
+              backgroundColor: colors.cream,
+              border: `1px solid ${colors.primaryRed}`,
+              color: colors.primaryRed,
+              padding: "8px 12px",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
             Cancelar
           </button>
         )}
       </form>
 
-      <table border="1" cellPadding="5" cellSpacing="0">
-        <thead>
+      {/* Tabla */}
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead style={{ backgroundColor: colors.jadeGreen, color: "#FFF" }}>
           <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Full Name</th>
-            <th>Role</th>
-            <th>Acciones</th>
+            <th style={{ padding: "8px" }}>Username</th>
+            <th style={{ padding: "8px" }}>Email</th>
+            <th style={{ padding: "8px" }}>Full Name</th>
+            <th style={{ padding: "8px" }}>Role</th>
+            <th style={{ padding: "8px" }}>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {users.map((u) => (
-            <tr key={u.id}>
-              <td>{u.username}</td>
-              <td>{u.email}</td>
-              <td>{u.full_name}</td>
-              <td>{roles.find(r => r.id === u.role_id)?.name || "N/A"}</td>
-              <td>
-                <button onClick={() => handleEdit(u)}>Editar</button>
-                <button onClick={() => handleDelete(u.id)} style={{ marginLeft: "5px" }}>
+            <tr key={u.id} style={{ borderBottom: "1px solid #ccc" }}>
+              <td style={{ padding: "8px", color: colors.darkText }}>{u.username}</td>
+              <td style={{ padding: "8px", color: colors.darkText }}>{u.email}</td>
+              <td style={{ padding: "8px", color: colors.darkText }}>{u.full_name}</td>
+              <td style={{ padding: "8px", color: colors.darkText }}>
+                {roles.find(r => r.id === u.role_id)?.name || "N/A"}
+              </td>
+              <td style={{ padding: "8px" }}>
+                <button
+                  onClick={() => handleEdit(u)}
+                  style={{
+                    backgroundColor: colors.accentOrange,
+                    color: "#FFF",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    border: "none",
+                    cursor: "pointer",
+                    marginRight: "5px"
+                  }}
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(u.id)}
+                  style={{
+                    backgroundColor: colors.primaryRed,
+                    color: "#FFF",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    border: "none",
+                    cursor: "pointer"
+                  }}
+                >
                   Eliminar
                 </button>
               </td>

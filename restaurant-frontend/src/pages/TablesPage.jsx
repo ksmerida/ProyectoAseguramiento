@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getTables, createTable, getTableStatus, updateTableStatus } from "../api/tables";
+import { colors } from "../theme";
 
 export default function TablesPage() {
   const queryClient = useQueryClient();
@@ -28,7 +29,7 @@ export default function TablesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tableStatus"] });
       queryClient.invalidateQueries({ queryKey: ["tables"] });
-      setEditingTableId(null); // salir del modo edición al guardar
+      setEditingTableId(null);
     },
   });
 
@@ -53,45 +54,59 @@ export default function TablesPage() {
     setNewLocation("");
   };
 
-  // Colores según estado
+  // Colores según estado usando paleta guatemalteca
   const getColor = (status) => {
     switch (status) {
-      case "free": return "green";
-      case "occupied": return "red";
-      case "reserved": return "yellow";
-      case "cleaning": return "blue";
-      default: return "gray";
+      case "free": return colors.jadeGreen;
+      case "occupied": return colors.primaryRed;
+      case "reserved": return colors.accentOrange;
+      case "cleaning": return colors.blueSky;
+      default: return colors.gray;
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Mesas del Restaurante</h1>
+    <div style={{ padding: "20px", backgroundColor: colors.cream, minHeight: "100vh" }}>
+      <h1 style={{ color: colors.darkText }}>Mesas del Restaurante</h1>
 
+      {/* Agregar nueva mesa */}
       <div style={{ marginBottom: "20px" }}>
-        <h3>Agregar nueva mesa</h3>
+        <h3 style={{ color: colors.darkText }}>Agregar nueva mesa</h3>
         <input
           placeholder="Código"
           value={newCode}
           onChange={(e) => setNewCode(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="number"
           placeholder="Asientos"
           value={newSeats}
           onChange={(e) => setNewSeats(Number(e.target.value))}
-          style={{ width: "80px", marginRight: "10px" }}
+          style={{ width: "80px", marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           placeholder="Ubicación"
           value={newLocation}
           onChange={(e) => setNewLocation(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
-        <button onClick={handleAddTable}>Agregar Mesa</button>
+        <button
+          onClick={handleAddTable}
+          style={{
+            backgroundColor: colors.primaryRed,
+            color: "#FFF",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          Agregar Mesa
+        </button>
       </div>
 
+      {/* Listado de mesas */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
         {tables.map((table) => {
           const statusObj = tableStatuses.find((s) => s.table_id === table.id);
@@ -112,6 +127,7 @@ export default function TablesPage() {
                 alignItems: "center",
                 padding: "10px",
                 cursor: "pointer",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
               }}
               onClick={() => setEditingTableId(table.id)}
             >
@@ -124,9 +140,9 @@ export default function TablesPage() {
                 <select
                   value={statusObj?.status || ""}
                   onChange={(e) => handleStateChange(statusObj, e.target.value)}
-                  style={{ marginTop: "8px" }}
+                  style={{ marginTop: "8px", borderRadius: "4px", padding: "4px" }}
                   autoFocus
-                  onBlur={() => setEditingTableId(null)} // cerrar al salir
+                  onBlur={() => setEditingTableId(null)}
                 >
                   <option value="">-- Estado --</option>
                   <option value="free">Libre</option>

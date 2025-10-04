@@ -11,6 +11,7 @@ import {
   deleteOrderItem,
 } from "../api/orders";
 import axios from "axios";
+import { colors } from "../theme";
 
 const apiUrl = "http://localhost:8000";
 
@@ -137,38 +138,85 @@ export default function OrdersPOSPage() {
 
   if (ordersLoading) return <div>Cargando órdenes...</div>;
 
+  // Color de estado usando paleta
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending": return colors.accentOrange;
+      case "confirmed": return colors.jadeGreen;
+      case "cancelled": return colors.primaryRed;
+      case "seated": return colors.blueSky;
+      case "no_show": return colors.gray;
+      default: return colors.darkText;
+    }
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Órdenes</h1>
+    <div style={{ padding: "20px", backgroundColor: colors.cream, minHeight: "100vh" }}>
+      <h1 style={{ color: colors.darkText }}>Órdenes</h1>
 
       {/* Formulario de Orden */}
       <form onSubmit={handleOrderSubmit} style={{ marginBottom: "20px" }}>
-        <select name="tableId" value={orderForm.tableId} onChange={handleOrderChange} style={{ marginRight: "10px" }}>
+        <select
+          name="tableId"
+          value={orderForm.tableId}
+          onChange={handleOrderChange}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
+        >
           <option value="">Mesa</option>
           {tables.map(t => <option key={t.id} value={t.id}>{t.code}</option>)}
         </select>
-        <select name="customerId" value={orderForm.customerId} onChange={handleOrderChange} style={{ marginRight: "10px" }}>
+        <select
+          name="customerId"
+          value={orderForm.customerId}
+          onChange={handleOrderChange}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
+        >
           <option value="">Cliente</option>
           {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
-        <label style={{ marginRight: "10px" }}>
+        <label style={{ marginRight: "10px", color: colors.darkText }}>
           Takeaway
           <input type="checkbox" name="isTakeaway" checked={orderForm.isTakeaway} onChange={handleOrderChange} />
         </label>
-        <select name="status" value={orderForm.status} onChange={handleOrderChange} style={{ marginRight: "10px" }}>
+        <select
+          name="status"
+          value={orderForm.status}
+          onChange={handleOrderChange}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
+        >
           <option value="pending">Pendiente</option>
           <option value="confirmed">Confirmada</option>
           <option value="cancelled">Cancelada</option>
           <option value="seated">Sentada</option>
           <option value="no_show">No show</option>
         </select>
-        <button type="submit">{selectedOrder ? "Actualizar" : "Agregar"}</button>
-        {selectedOrder && <button type="button" onClick={() => setSelectedOrder(null)} style={{ marginLeft: "10px" }}>Cancelar</button>}
+        <button
+          type="submit"
+          style={{
+            backgroundColor: colors.primaryRed,
+            color: "#FFF",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          {selectedOrder ? "Actualizar" : "Agregar"}
+        </button>
+        {selectedOrder && (
+          <button
+            type="button"
+            onClick={() => setSelectedOrder(null)}
+            style={{ marginLeft: "10px", padding: "6px 12px", borderRadius: "4px" }}
+          >
+            Cancelar
+          </button>
+        )}
       </form>
 
       {/* Tabla de Órdenes */}
-      <table border="1" cellPadding="5" cellSpacing="0" style={{ width: "100%", marginBottom: "20px" }}>
-        <thead>
+      <table border="1" cellPadding="5" cellSpacing="0" style={{ width: "100%", marginBottom: "20px", backgroundColor: "#FFF", borderRadius: "4px" }}>
+        <thead style={{ backgroundColor: colors.jadeGreen, color: "#FFF" }}>
           <tr>
             <th>Mesa</th>
             <th>Cliente</th>
@@ -186,12 +234,37 @@ export default function OrdersPOSPage() {
               <tr key={o.id} style={{ backgroundColor: selectedOrder?.id === o.id ? "#eee" : "transparent" }}>
                 <td>{tables.find(t => t.id === o.table_id)?.code || "N/A"}</td>
                 <td>{customers.find(c => c.id === o.customer_id)?.name || "N/A"}</td>
-                <td style={{ color: o.status === "cancelled" ? "red" : o.status === "confirmed" ? "green" : "black" }}>{o.status}</td>
+                <td style={{ color: getStatusColor(o.status) }}>{o.status}</td>
                 <td>{o.is_takeaway ? "Sí" : "No"}</td>
                 <td>{orderTotal.toFixed(2)}</td>
                 <td>
-                  <button onClick={() => handleOrderSelect(o)}>Editar</button>
-                  <button onClick={() => orderDeleteMutation.mutate(o.id)} style={{ marginLeft: "5px" }}>Eliminar</button>
+                  <button
+                    onClick={() => handleOrderSelect(o)}
+                    style={{
+                      backgroundColor: colors.accentOrange,
+                      color: "#FFF",
+                      border: "none",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => orderDeleteMutation.mutate(o.id)}
+                    style={{
+                      marginLeft: "5px",
+                      backgroundColor: colors.primaryRed,
+                      color: "#FFF",
+                      border: "none",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Eliminar
+                  </button>
                 </td>
               </tr>
             );
@@ -202,19 +275,36 @@ export default function OrdersPOSPage() {
       {/* Items de la Orden */}
       {selectedOrder && (
         <>
-          <h2>Items de la Orden (Total: {totalOrder.toFixed(2)})</h2>
+          <h2 style={{ color: colors.darkText }}>Items de la Orden (Total: {totalOrder.toFixed(2)})</h2>
           <form onSubmit={handleItemSubmit} style={{ marginBottom: "20px" }}>
-            <select name="menuItemId" value={itemForm.menuItemId} onChange={handleItemChange} style={{ marginRight: "10px" }}>
+            <select
+              name="menuItemId"
+              value={itemForm.menuItemId}
+              onChange={handleItemChange}
+              style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
+            >
               <option value="">Producto</option>
               {menuItems.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
             </select>
-            <input type="number" name="quantity" value={itemForm.quantity} min="1" onChange={handleItemChange} style={{ marginRight: "10px" }} />
-            <input type="number" name="unitPrice" value={itemForm.unitPrice} min="0" step="0.01" onChange={handleItemChange} style={{ marginRight: "10px" }} />
-            <button type="submit">Agregar Item</button>
+            <input type="number" name="quantity" value={itemForm.quantity} min="1" onChange={handleItemChange} style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }} />
+            <input type="number" name="unitPrice" value={itemForm.unitPrice} min="0" step="0.01" onChange={handleItemChange} style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }} />
+            <button
+              type="submit"
+              style={{
+                backgroundColor: colors.jadeGreen,
+                color: "#FFF",
+                padding: "6px 12px",
+                borderRadius: "4px",
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              Agregar Item
+            </button>
           </form>
 
-          <table border="1" cellPadding="5" cellSpacing="0" style={{ width: "100%" }}>
-            <thead>
+          <table border="1" cellPadding="5" cellSpacing="0" style={{ width: "100%", backgroundColor: "#FFF", borderRadius: "4px" }}>
+            <thead style={{ backgroundColor: colors.accentOrange, color: "#FFF" }}>
               <tr>
                 <th>Producto</th>
                 <th>Cantidad</th>
@@ -233,6 +323,7 @@ export default function OrdersPOSPage() {
                       value={i.quantity}
                       min="1"
                       onChange={(e) => orderItemUpdateMutation.mutate({ id: i.id, data: { quantity: Number(e.target.value) } })}
+                      style={{ width: "60px", padding: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
                     />
                   </td>
                   <td>
@@ -242,11 +333,24 @@ export default function OrdersPOSPage() {
                       min="0"
                       step="0.01"
                       onChange={(e) => orderItemUpdateMutation.mutate({ id: i.id, data: { unit_price: Number(e.target.value) } })}
+                      style={{ width: "80px", padding: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
                     />
                   </td>
                   <td>{(i.quantity * i.unit_price).toFixed(2)}</td>
                   <td>
-                    <button onClick={() => orderItemDeleteMutation.mutate(i.id)}>Eliminar</button>
+                    <button
+                      onClick={() => orderItemDeleteMutation.mutate(i.id)}
+                      style={{
+                        backgroundColor: colors.primaryRed,
+                        color: "#FFF",
+                        border: "none",
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               ))}

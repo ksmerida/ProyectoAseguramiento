@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { colors } from "../theme";
 
 const apiUrl = "http://127.0.0.1:8000";
 
-export default function MenuCategoriesPages() {
+export default function MenuCategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -31,10 +32,8 @@ export default function MenuCategoriesPages() {
     const payload = { name, description, sort_order: sortOrder, is_active: true };
 
     if (editingCategory) {
-      // Actualizar categoría
       await axios.put(`${apiUrl}/menu_categories/${editingCategory.id}`, payload);
     } else {
-      // Crear categoría
       await axios.post(`${apiUrl}/menu_categories`, payload);
     }
 
@@ -57,55 +56,112 @@ export default function MenuCategoriesPages() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Categorías de Menú</h1>
+    <div style={{ padding: "20px", backgroundColor: colors.cream, minHeight: "100vh" }}>
+      <h1 style={{ color: colors.darkText }}>Categorías de Menú</h1>
 
+      {/* Formulario */}
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
         <input
           type="text"
           placeholder="Nombre de categoría"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{
+            marginRight: "10px",
+            padding: "6px",
+            borderRadius: "4px",
+            border: "1px solid #ccc"
+          }}
         />
         <input
           type="text"
           placeholder="Descripción"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{
+            marginRight: "10px",
+            padding: "6px",
+            borderRadius: "4px",
+            border: "1px solid #ccc"
+          }}
         />
-        <button type="submit">{editingCategory ? "Actualizar" : "Agregar"}</button>
+        <button
+          type="submit"
+          style={{
+            backgroundColor: colors.primaryRed,
+            color: "#FFF",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          {editingCategory ? "Actualizar" : "Agregar"}
+        </button>
         {editingCategory && (
-          <button type="button" onClick={clearForm} style={{ marginLeft: "10px" }}>
+          <button
+            type="button"
+            onClick={clearForm}
+            style={{
+              marginLeft: "10px",
+              backgroundColor: colors.cream,
+              border: `1px solid ${colors.primaryRed}`,
+              color: colors.primaryRed,
+              padding: "8px 12px",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
             Cancelar
           </button>
         )}
       </form>
 
-      <table border="1" cellPadding="5" cellSpacing="0">
-        <thead>
+      {/* Tabla */}
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead style={{ backgroundColor: colors.jadeGreen, color: "#FFF" }}>
           <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Acciones</th>
+            <th style={{ padding: "8px" }}>Nombre</th>
+            <th style={{ padding: "8px" }}>Descripción</th>
+            <th style={{ padding: "8px" }}>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {categories
-            .filter(c => c.is_active)
-            .map((c) => (
-              <tr key={c.id}>
-                <td>{c.name}</td>
-                <td>{c.description}</td>
-                <td>
-                  <button onClick={() => handleEdit(c)}>Editar</button>
-                  <button onClick={() => handleDelete(c.id)} style={{ marginLeft: "5px" }}>
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
+          {categories.map((c) => (
+            <tr key={c.id} style={{ borderBottom: "1px solid #ccc" }}>
+              <td style={{ padding: "8px", color: colors.darkText }}>{c.name}</td>
+              <td style={{ padding: "8px", color: colors.darkText }}>{c.description}</td>
+              <td style={{ padding: "8px" }}>
+                <button
+                  onClick={() => handleEdit(c)}
+                  style={{
+                    backgroundColor: colors.accentOrange,
+                    color: "#FFF",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    border: "none",
+                    cursor: "pointer",
+                    marginRight: "5px"
+                  }}
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(c.id)}
+                  style={{
+                    backgroundColor: colors.primaryRed,
+                    color: "#FFF",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    border: "none",
+                    cursor: "pointer"
+                  }}
+                >
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

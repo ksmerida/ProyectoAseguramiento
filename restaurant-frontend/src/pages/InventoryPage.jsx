@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getInventory, createInventory, updateInventory, deleteInventory } from "../api/inventory";
+import { colors } from "../theme";
 
 export default function InventoryPage() {
   const queryClient = useQueryClient();
@@ -12,33 +13,19 @@ export default function InventoryPage() {
   const [minimumStock, setMinimumStock] = useState(0);
   const [editingItem, setEditingItem] = useState(null);
 
-  // ✅ Fetch inventory
-  const { data: inventory = [], isLoading } = useQuery({
-    queryKey: ["inventory"],
-    queryFn: getInventory
-  });
+  const { data: inventory = [], isLoading } = useQuery({ queryKey: ["inventory"], queryFn: getInventory });
 
-  // ✅ Mutation para crear/actualizar
   const inventoryMutation = useMutation({
-    mutationFn: (data) => {
-      if (editingItem) {
-        return updateInventory(editingItem.id, data);
-      } else {
-        return createInventory({ ...data, is_active: true });
-      }
-    },
+    mutationFn: (data) => editingItem ? updateInventory(editingItem.id, data) : createInventory({ ...data, is_active: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
       clearForm();
     }
   });
 
-  // ✅ Delete (lógico)
   const deleteMutation = useMutation({
     mutationFn: deleteInventory,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["inventory"] });
-    }
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["inventory"] }),
   });
 
   const clearForm = () => {
@@ -75,8 +62,8 @@ export default function InventoryPage() {
   if (isLoading) return <div>Cargando inventario...</div>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Inventario</h1>
+    <div style={{ padding: "20px", backgroundColor: colors.cream, minHeight: "100vh" }}>
+      <h1 style={{ color: colors.darkText }}>Inventario</h1>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
         <input
@@ -84,42 +71,68 @@ export default function InventoryPage() {
           placeholder="Nombre del item"
           value={itemName}
           onChange={(e) => setItemName(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="text"
           placeholder="SKU"
           value={sku}
           onChange={(e) => setSku(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="text"
           placeholder="Unidad (kg, l, unidad)"
           value={unit}
           onChange={(e) => setUnit(e.target.value)}
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="number"
           placeholder="Cantidad"
           value={quantity}
           onChange={(e) => setQuantity(Number(e.target.value))}
-          style={{ marginRight: "10px", width: "80px" }}
+          style={{ marginRight: "10px", width: "80px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
         <input
           type="number"
           placeholder="Stock mínimo"
           value={minimumStock}
           onChange={(e) => setMinimumStock(Number(e.target.value))}
-          style={{ marginRight: "10px", width: "80px" }}
+          style={{ marginRight: "10px", width: "80px", padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
-        <button type="submit">{editingItem ? "Actualizar" : "Agregar"}</button>
-        {editingItem && <button type="button" onClick={clearForm} style={{ marginLeft: "10px" }}>Cancelar</button>}
+        <button
+          type="submit"
+          style={{
+            backgroundColor: colors.jadeGreen,
+            color: "#FFF",
+            padding: "6px 12px",
+            borderRadius: "4px",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          {editingItem ? "Actualizar" : "Agregar"}
+        </button>
+        {editingItem && (
+          <button
+            type="button"
+            onClick={clearForm}
+            style={{
+              marginLeft: "10px",
+              padding: "6px 12px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              cursor: "pointer"
+            }}
+          >
+            Cancelar
+          </button>
+        )}
       </form>
 
-      <table border="1" cellPadding="5" cellSpacing="0">
-        <thead>
+      <table border="1" cellPadding="5" cellSpacing="0" style={{ width: "100%", backgroundColor: "#FFF", borderRadius: "4px" }}>
+        <thead style={{ backgroundColor: colors.accentOrange, color: "#FFF" }}>
           <tr>
             <th>Nombre</th>
             <th>SKU</th>
@@ -138,8 +151,33 @@ export default function InventoryPage() {
               <td>{item.quantity}</td>
               <td>{item.minimum_stock}</td>
               <td>
-                <button onClick={() => handleEdit(item)}>Editar</button>
-                <button onClick={() => handleDelete(item.id)} style={{ marginLeft: "5px" }}>Eliminar</button>
+                <button
+                  onClick={() => handleEdit(item)}
+                  style={{
+                    backgroundColor: colors.jadeGreen,
+                    color: "#FFF",
+                    border: "none",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  style={{
+                    marginLeft: "5px",
+                    backgroundColor: colors.primaryRed,
+                    color: "#FFF",
+                    border: "none",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Eliminar
+                </button>
               </td>
             </tr>
           ))}

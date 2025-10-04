@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import LoginPage from "./pages/LoginPage";
+import Login from "./components/Login"; // <-- Importa Login aquí
 import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
 import CustomersPage from "./pages/CustomersPage";
@@ -14,13 +14,18 @@ import OrdersPage from "./pages/OrdersPage";
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      {/* Ruta de login */}
+      <Route path="/login" element={<Login />} />
 
-      <Route path="/" element={
-        <ProtectedRoute>
-          <DashboardLayout />
-        </ProtectedRoute>
-      }>
+      {/* Rutas protegidas */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<h2>Panel principal</h2>} />
         <Route path="users" element={<UsersPage />} />
         <Route path="roles" element={<RolesPage />} />
