@@ -1,35 +1,24 @@
-import React, { useState } from "react";
+import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTables, createTable, getTableStatus, updateTableStatus } from "../api/tables";
+import { getTables, createTable, updateTableStatus } from "../api/tables";
 
 export default function TablesPage() {
   const queryClient = useQueryClient();
 
-  const [newCode, setNewCode] = useState("");
-  const [newSeats, setNewSeats] = useState(2);
-  const [newLocation, setNewLocation] = useState("");
-  const [editingTableId, setEditingTableId] = useState(null);
+  const [newCode, setNewCode] = React.useState("");
+  const [newSeats, setNewSeats] = React.useState(2);
+  const [newLocation, setNewLocation] = React.useState("");
 
-  // Fetch mesas
-  const { data: tables = [], isLoading: tablesLoading } = useQuery({
+  // Fetch mesas con estado
+  const { data: tables = [], isLoading } = useQuery({
     queryKey: ["tables"],
     queryFn: getTables,
-  });
-
-  // Fetch estados
-  const { data: tableStatuses = [], isLoading: statusLoading } = useQuery({
-    queryKey: ["tableStatus"],
-    queryFn: getTableStatus,
   });
 
   // Mutación para actualizar estado
   const updateMutation = useMutation({
     mutationFn: ({ id, status }) => updateTableStatus(id, { status }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tableStatus"] });
-      queryClient.invalidateQueries({ queryKey: ["tables"] });
-      setEditingTableId(null); // salir del modo edición al guardar
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tables"] }),
   });
 
   // Mutación para agregar mesa
@@ -38,29 +27,35 @@ export default function TablesPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tables"] }),
   });
 
-  if (tablesLoading || statusLoading) return <div>Cargando mesas...</div>;
-
-  const handleStateChange = (statusObj, newStatus) => {
-    if (!newStatus) return;
-    updateMutation.mutate({ id: statusObj.id, status: newStatus });
-  };
+  if (isLoading) return <div>Cargando mesas...</div>;
 
   const handleAddTable = () => {
-    if (!newCode || newSeats <= 0) return alert("Código y número de asientos son obligatorios");
-    createMutation.mutate({ code: newCode, seats: newSeats, location: newLocation });
+    if (!newCode || newSeats <= 0)
+      return alert("Código y número de asientos son obligatorios");
+
+    createMutation.mutate({
+      code: newCode,
+      seats: newSeats,
+      location: newLocation,
+    });
+
     setNewCode("");
     setNewSeats(2);
     setNewLocation("");
   };
 
-  // Colores según estado
   const getColor = (status) => {
     switch (status) {
-      case "free": return "green";
-      case "occupied": return "red";
-      case "reserved": return "yellow";
-      case "cleaning": return "blue";
-      default: return "gray";
+      case "free":
+        return "green";
+      case "occupied":
+        return "red";
+      case "reserved":
+        return "orange";
+      case "cleaning":
+        return "blue";
+      default:
+        return "gray";
     }
   };
 
@@ -68,6 +63,7 @@ export default function TablesPage() {
     <div style={{ padding: "20px" }}>
       <h1>Mesas del Restaurante</h1>
 
+      {/* Formulario para agregar nueva mesa */}
       <div style={{ marginBottom: "20px" }}>
         <h3>Agregar nueva mesa</h3>
         <input
@@ -92,52 +88,52 @@ export default function TablesPage() {
         <button onClick={handleAddTable}>Agregar Mesa</button>
       </div>
 
+      {/* Mostrar mesas */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
-        {tables.map((table) => {
-          const statusObj = tableStatuses.find((s) => s.table_id === table.id);
-          const isEditing = editingTableId === table.id;
+        {tables.map((table) => (
+          <div
+            key={table.id}
+            style={{
+              width: "160px",
+              height: "140px",
+              borderRadius: "8px",
+              backgroundColor: getColor(table.status),
+              color: "white",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "10px",
+            }}
+          >
+            <strong>{table.code}</strong>
+            <span>{table.seats} asientos</span>
+            <span>{table.location}</span>
 
-          return (
-            <div
-              key={table.id}
+            {/* Select para cambiar estado */}
+            <select
+              value={table.status || "free"}
+              onChange={(e) =>
+                updateMutation.mutate({
+                  id: table.status_id,
+                  status: e.target.value,
+                })
+              }
               style={{
-                width: "160px",
-                height: "120px",
-                borderRadius: "8px",
-                backgroundColor: getColor(statusObj?.status),
-                color: "white",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: "10px",
+                marginTop: "10px",
+                padding: "4px",
+                borderRadius: "4px",
+                border: "none",
                 cursor: "pointer",
               }}
-              onClick={() => setEditingTableId(table.id)}
             >
-              <strong>{table.code}</strong>
-              <span>{table.seats} asientos</span>
-              <span>{table.location}</span>
-              {!isEditing ? (
-                <small>{statusObj?.status || "N/A"}</small>
-              ) : (
-                <select
-                  value={statusObj?.status || ""}
-                  onChange={(e) => handleStateChange(statusObj, e.target.value)}
-                  style={{ marginTop: "8px" }}
-                  autoFocus
-                  onBlur={() => setEditingTableId(null)} // cerrar al salir
-                >
-                  <option value="">-- Estado --</option>
-                  <option value="free">Libre</option>
-                  <option value="occupied">Ocupada</option>
-                  <option value="reserved">Reservada</option>
-                  <option value="cleaning">Limpieza</option>
-                </select>
-              )}
-            </div>
-          );
-        })}
+              <option value="free">Libre</option>
+              <option value="occupied">Ocupada</option>
+              <option value="reserved">Reservada</option>
+              <option value="cleaning">Limpieza</option>
+            </select>
+          </div>
+        ))}
       </div>
     </div>
   );
