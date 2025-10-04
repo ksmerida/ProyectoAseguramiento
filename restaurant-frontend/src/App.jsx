@@ -1,8 +1,12 @@
-import React from "react";
+import React from "react"; 
 import { Routes, Route } from "react-router-dom";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "./components/Login"; // <-- Importa Login aquí
+
+// Login
+import LoginPage from "./pages/LoginPages";
+
+// Pages
 import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
 import CustomersPage from "./pages/CustomersPage";
@@ -15,7 +19,7 @@ export default function App() {
   return (
     <Routes>
       {/* Ruta de login */}
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<LoginPage />} />
 
       {/* Rutas protegidas */}
       <Route
@@ -26,7 +30,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<h2>Panel principal</h2>} />
+        <Route index element={<h2>Bienvenido al sistema del restaurante 🍽️</h2>} />
         <Route path="users" element={<UsersPage />} />
         <Route path="roles" element={<RolesPage />} />
         <Route path="customers" element={<CustomersPage />} />

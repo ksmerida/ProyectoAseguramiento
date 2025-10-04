@@ -41,11 +41,6 @@ export default function TablesPage() {
 
   if (tablesLoading || statusLoading) return <div>Cargando mesas...</div>;
 
-  const handleStateChange = (statusObj, newStatus) => {
-    if (!newStatus) return;
-    updateMutation.mutate({ id: statusObj.id, status: newStatus });
-  };
-
   const handleAddTable = () => {
     if (!newCode || newSeats <= 0) return alert("Código y número de asientos son obligatorios");
     createMutation.mutate({ code: newCode, seats: newSeats, location: newLocation });
@@ -57,11 +52,16 @@ export default function TablesPage() {
   // Colores según estado usando paleta guatemalteca
   const getColor = (status) => {
     switch (status) {
-      case "free": return colors.jadeGreen;
-      case "occupied": return colors.primaryRed;
-      case "reserved": return colors.accentOrange;
-      case "cleaning": return colors.blueSky;
-      default: return colors.gray;
+      case "free":
+        return colors.jadeGreen;
+      case "occupied":
+        return colors.primaryRed;
+      case "reserved":
+        return colors.accentOrange;
+      case "cleaning":
+        return colors.blueSky;
+      default:
+        return colors.gray;
     }
   };
 
@@ -99,7 +99,7 @@ export default function TablesPage() {
             padding: "8px 12px",
             borderRadius: "4px",
             border: "none",
-            cursor: "pointer"
+            cursor: "pointer",
           }}
         >
           Agregar Mesa
@@ -109,8 +109,22 @@ export default function TablesPage() {
       {/* Listado de mesas */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
         {tables.map((table) => {
-          const statusObj = tableStatuses.find((s) => s.table_id === table.id);
+          // Buscar el estado correspondiente; si no existe, usar valores por defecto
+          const statusObj = tableStatuses.find((s) => s.table_id === table.id) || { id: null, status: "free" };
           const isEditing = editingTableId === table.id;
+
+          // Mapear valores internos a etiquetas en español
+          const statusLabels = {
+            free: "Libre",
+            occupied: "Ocupada",
+            reserved: "Reservada",
+            cleaning: "Limpieza",
+          };
+
+          const handleChange = (newStatus) => {
+            if (!statusObj.id || !newStatus) return; // Evita crash si no hay id
+            updateMutation.mutate({ id: statusObj.id, status: newStatus });
+          };
 
           return (
             <div
@@ -119,7 +133,7 @@ export default function TablesPage() {
                 width: "160px",
                 height: "120px",
                 borderRadius: "8px",
-                backgroundColor: getColor(statusObj?.status),
+                backgroundColor: getColor(statusObj.status),
                 color: "white",
                 display: "flex",
                 flexDirection: "column",
@@ -127,19 +141,20 @@ export default function TablesPage() {
                 alignItems: "center",
                 padding: "10px",
                 cursor: "pointer",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
+                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
               }}
               onClick={() => setEditingTableId(table.id)}
             >
               <strong>{table.code}</strong>
               <span>{table.seats} asientos</span>
               <span>{table.location}</span>
+
               {!isEditing ? (
-                <small>{statusObj?.status || "N/A"}</small>
+                <small>{statusLabels[statusObj.status] || "N/A"}</small>
               ) : (
                 <select
-                  value={statusObj?.status || ""}
-                  onChange={(e) => handleStateChange(statusObj, e.target.value)}
+                  value={statusObj.status || ""}
+                  onChange={(e) => handleChange(e.target.value)}
                   style={{ marginTop: "8px", borderRadius: "4px", padding: "4px" }}
                   autoFocus
                   onBlur={() => setEditingTableId(null)}
