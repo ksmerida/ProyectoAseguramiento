@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta, datetime
 from pydantic import BaseModel
+from typing import Optional
 
 from app import schemas, crud
 from app.database import get_db
@@ -21,26 +22,29 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 # =======================
 # RESPONSE MODELS
 # =======================
+class UserResponse(BaseModel):
+    id: str
+    username: str
+    email: Optional[str]
+    role: str
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+    user: UserResponse
 
 
 # =======================
-# LOGIN (compatible Swagger)
+# LOGIN
 # =======================
 @router.post("/login", response_model=TokenResponse)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    """
-    Login: permite username o email, actualiza last_login
-    Devuelve access token y refresh token.
-    Compatible con Swagger UI
-    """
     username_or_email = form_data.username
     password = form_data.password
 
-    # Buscar usuario por username o email
+    # Buscar usuario
     user = crud.get_user_by_username(db, username_or_email)
     if not user:
         user = crud.get_user_by_email(db, username_or_email)
@@ -77,7 +81,13 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     return TokenResponse(
         access_token=access_token,
-        refresh_token=refresh_token
+        refresh_token=refresh_token,
+        user={
+            "id": str(user.id),
+            "username": user.username,
+            "email": user.email,
+            "role": user.role.name  # <- asegúrate que User tenga relación con Role
+        }
     )
 
 
@@ -85,9 +95,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 # GET CURRENT USER
 # =======================
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    """
-    Devuelve el usuario actual basado en el token JWT
-    """
     try:
         payload = decode_token(token)
         username = payload.get("sub")
@@ -143,9 +150,6 @@ def refresh_access_token(
     token_request: RefreshTokenRequest,
     db: Session = Depends(get_db)
 ):
-    """
-    Recibe un refresh token y devuelve un nuevo access token.
-    """
     try:
         payload = decode_token(token_request.refresh_token)
         username = payload.get("sub")
@@ -167,5 +171,11 @@ def refresh_access_token(
 
     return TokenResponse(
         access_token=access_token,
-        refresh_token=token_request.refresh_token  # se mantiene el mismo refresh token
+        refresh_token=token_request.refresh_token,
+        user={
+            "id": str(user.id),
+            "username": user.username,
+            "email": user.email,
+            "role": user.role.name
+        }
     )

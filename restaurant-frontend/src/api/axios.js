@@ -1,14 +1,13 @@
+// src/api/axiosConfig.js
 import axios from "axios";
-import { API_URL } from "./config";
+
+const API_URL = "http://localhost:8000";
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
-// agrega token si existe
+// Interceptor para enviar siempre el token si existe
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
