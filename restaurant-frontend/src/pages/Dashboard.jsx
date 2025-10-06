@@ -10,6 +10,7 @@ import InventoryPage from "./InventoryPage";
 import RecipeItemsPage from "./RecipeItemsPage";
 import OrdersPage from "./OrdersPage";
 import TablesPage from "./TablesPage";
+import CocinaPage from "./KitchenPage"; // <-- import agregado
 
 export default function Dashboard() {
   return (
@@ -26,6 +27,7 @@ export default function Dashboard() {
           <Route path="recipes" element={<RecipeItemsPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="tables" element={<TablesPage />} />
+          <Route path="cocina" element={<CocinaPage />} /> {/* <-- ruta agregada */}
           <Route path="*" element={<h2>Seleccione una opción del menú</h2>} />
         </Routes>
       </div>

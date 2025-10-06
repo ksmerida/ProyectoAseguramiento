@@ -103,6 +103,12 @@ class TableStatus(TableStatusBase):
         from_attributes = True
 
 # ----------------------------
+# Schema para actualizar solo el estado
+# ----------------------------
+class TableStatusUpdate(BaseModel):
+    status: str
+
+# ----------------------------
 # Reservations
 # ----------------------------
 class ReservationBase(BaseModel):

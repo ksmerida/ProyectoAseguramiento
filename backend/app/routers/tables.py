@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 from typing import List
 from app import crud, schemas
@@ -7,6 +7,9 @@ import uuid
 
 router = APIRouter(prefix="/tables", tags=["Tables"])
 
+# ----------------------------
+# CRUD Mesas
+# ----------------------------
 @router.post("/", response_model=schemas.TableWithStatus)
 def create_table(table: schemas.TableCreate, db: Session = Depends(get_db)):
     return crud.create_table(db, table)
@@ -35,3 +38,27 @@ def delete_table(table_id: uuid.UUID, db: Session = Depends(get_db)):
     if not db_table:
         raise HTTPException(status_code=404, detail="Table not found")
     return db_table
+
+# ----------------------------
+# PATCH para actualizar solo el estado
+# ----------------------------
+class TableStatusUpdate(schemas.BaseModel):
+    status: str
+
+@router.patch("/{table_id}/status", response_model=schemas.TableWithStatus)
+def update_table_status(table_id: uuid.UUID, status_update: TableStatusUpdate = Body(...), db: Session = Depends(get_db)):
+    table = crud.update_table_status(db, table_id, status_update.status)
+    if not table:
+        raise HTTPException(status_code=404, detail="Mesa no encontrada")
+    return table
+
+# ----------------------------
+# eliminar mesa
+# routers/tables.py
+@router.delete("/{table_id}", response_model=schemas.TableWithStatus)
+def delete_table_route(table_id: uuid.UUID, db: Session = Depends(get_db)):
+    deleted_table = crud.delete_table(db, table_id)
+    if not deleted_table:
+        raise HTTPException(status_code=404, detail="Table not found")
+    return deleted_table
+

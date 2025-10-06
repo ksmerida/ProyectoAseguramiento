@@ -13,13 +13,15 @@ export const createTable = async (tableData) => {
   return response.data;
 };
 
-// Estados de mesas
-export const getTableStatus = async () => {
-  const response = await axios.get(`${API_URL}/table_status`);
+// Actualizar estado de mesa
+export const updateTableStatus = async (id, statusData) => {
+  // PATCH al endpoint correcto con solo { status }
+  const response = await axios.patch(`${API_URL}/tables/${id}/status`, statusData);
   return response.data;
 };
 
-export const updateTableStatus = async (id, statusData) => {
-  const response = await axios.put(`${API_URL}/table_status/${id}`, statusData);
+// Eliminar mesa
+export const deleteTable = async (id) => {
+  const response = await axios.delete(`${API_URL}/tables/${id}`);
   return response.data;
 };

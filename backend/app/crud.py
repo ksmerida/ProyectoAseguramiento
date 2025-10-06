@@ -175,6 +175,62 @@ def get_tables_with_status(db: Session):
         result.append(table_with_status)
     return result
 
+# Actualizar solo el estado de una mesa
+def update_table_status(db: Session, table_id: uuid.UUID, new_status: str):
+    # Buscar el estado actual de la mesa
+    db_status = db.query(models.TableStatus).filter(models.TableStatus.table_id == table_id).first()
+    if not db_status:
+        return None
+    
+    db_status.status = new_status
+    db.commit()
+    db.refresh(db_status)
+
+    # También podemos devolver la mesa combinada con status
+    db_table = db.query(models.Table).filter(models.Table.id == table_id).first()
+    if not db_table:
+        return None
+
+    from app.schemas import TableWithStatus
+    return TableWithStatus(
+        id=db_table.id,
+        code=db_table.code,
+        seats=db_table.seats,
+        location=db_table.location,
+        is_active=db_table.is_active,
+        created_at=db_table.created_at,
+        status=db_status.status,
+        status_id=db_status.id
+    )
+
+#-----------------------------
+# Eliminar mesa (lógico) y su estado
+# crud.py
+def delete_table(db: Session, table_id: uuid.UUID):
+    table = db.query(models.Table).filter(models.Table.id == table_id).first()
+    if not table:
+        return None
+
+    # Eliminar estado asociado
+    db.query(models.TableStatus).filter(models.TableStatus.table_id == table_id).delete(synchronize_session=False)
+
+    # Eliminar mesa
+    db.delete(table)
+    db.commit()
+
+    # Devolver información para que el frontend pueda mostrar algo
+    return {
+        "id": table.id,
+        "code": table.code,
+        "seats": table.seats,
+        "location": table.location,
+        "is_active": table.is_active,
+        "created_at": table.created_at,
+        "status": "deleted",
+        "status_id": None
+    }
+
+
 # ----------------------------
 # Reservations CRUD
 # ----------------------------
@@ -373,6 +429,20 @@ def delete_order(db: Session, order_id: uuid.UUID):
         db.commit()
     return db_order
 
+# ----------------------------
+# Kitchen-specific Orders CRUD
+# ----------------------------
+def get_orders_by_status(db: Session, statuses: list) -> List[models.Order]:
+    return db.query(models.Order).filter(models.Order.status.in_(statuses)).all()
+
+def update_order_status(db: Session, order_id: uuid.UUID, status: str):
+    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    if not db_order:
+        return None
+    db_order.status = status
+    db.commit()
+    db.refresh(db_order)
+    return db_order
 
 # ----------------------------
 # OrderItems CRUD

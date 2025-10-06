@@ -1,16 +1,25 @@
+/* Importar fuentes antes de Tailwind */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;500&display=swap');
 
-body {
-  font-family: 'Roboto', sans-serif;
-  background: #FFF8E1;
-  color: #222;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Contenedor principal ocupa todo el viewport para centrar contenido */
+html, body, #root {
+  height: 100%;
+  width: 100%;
   margin: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', sans-serif;
+/* Tipografía personalizada y fondo */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(to bottom right, #E3F2FD, #E0F7FA);
+  color: #222;
 }
 
-a {
-  text-decoration: none;
+/* Tipografía de títulos */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
 }

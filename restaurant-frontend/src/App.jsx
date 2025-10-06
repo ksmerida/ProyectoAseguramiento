@@ -11,7 +11,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Página de login */}
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Dashboard con rutas internas */}
         <Route
           path="/dashboard/*"
           element={
@@ -20,6 +23,8 @@ export default function App() {
             </PrivateRoute>
           }
         />
+
+        {/* Ruta catch-all */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

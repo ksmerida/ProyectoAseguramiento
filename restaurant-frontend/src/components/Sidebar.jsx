@@ -23,21 +23,27 @@ const menuByRole = {
     { path: "/dashboard/recipes", label: "Recetas" },
     { path: "/dashboard/inventory", label: "Inventario" },
   ],
+  cajero: [
+    { path: "/dashboard/invoices", label: "Facturas" },
+    { path: "/dashboard/payments", label: "Pagos" },
+  ],
 };
 
-export default function Navbar() {
+export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user")) || {};
+
+  // Normalizar rol a minúsculas para evitar problemas de coincidencia
   const roleMapping = {
-    Administrador: "admin",
-    Mesero: "mesero",
-    Cocina: "cocina",
-    Cajero: "cajero",
+    administrador: "admin",
+    mesero: "mesero",
+    cocina: "cocina",
+    cajero: "cajero",
   };
-  const roleFromUser = user.role || "mesero";
+  const roleFromUser = (user.role || "mesero").toLowerCase();
   const role = roleMapping[roleFromUser] || "mesero";
 
   const handleLogout = () => {
@@ -52,7 +58,7 @@ export default function Navbar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: "#D32F2F", // rojo principal
+        background: "#D32F2F",
         padding: "10px 30px",
         color: "#FFF8E1",
         fontFamily: "'Montserrat', sans-serif",
@@ -85,8 +91,6 @@ export default function Navbar() {
               }}
             >
               {item.label}
-
-              {/* Línea animada */}
               <span
                 style={{
                   position: "absolute",
@@ -94,7 +98,7 @@ export default function Navbar() {
                   bottom: 0,
                   height: "3px",
                   width: isActive || hoveredIndex === idx ? "100%" : "0%",
-                  background: "#FBC02D", // dorado
+                  background: "#FBC02D",
                   transition: "width 0.3s ease",
                   borderRadius: "2px",
                 }}
