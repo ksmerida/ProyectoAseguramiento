@@ -10,13 +10,15 @@ import InventoryPage from "./InventoryPage";
 import RecipeItemsPage from "./RecipeItemsPage";
 import OrdersPage from "./OrdersPage";
 import TablesPage from "./TablesPage";
-import CocinaPage from "./KitchenPage"; // <-- import agregado
 
 export default function Dashboard() {
   return (
-    <div className="flex">
+    <div className="flex" style={{ minHeight: "100vh" }}>
+      {/* Sidebar a la izquierda */}
       <Sidebar />
-      <div className="flex-1 p-6">
+
+      {/* Contenido principal */}
+      <div className="flex-1 p-6" style={{ backgroundColor: "#F4F6F8" }}>
         <Routes>
           <Route path="users" element={<UsersPage />} />
           <Route path="roles" element={<RolesPage />} />
@@ -27,8 +29,43 @@ export default function Dashboard() {
           <Route path="recipes" element={<RecipeItemsPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="tables" element={<TablesPage />} />
-          <Route path="cocina" element={<CocinaPage />} /> {/* <-- ruta agregada */}
-          <Route path="*" element={<h2>Seleccione una opción del menú</h2>} />
+
+          {/* Mensaje profesional cuando no hay ruta seleccionada */}
+          <Route
+            path="*"
+            element={
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                  minHeight: "300px",
+                  fontSize: "20px",
+                  fontWeight: 600,
+                  color: "#555",
+                  textAlign: "center",
+                  backgroundColor: "#fff",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  padding: "20px",
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="50"
+                  height="50"
+                  fill="#F57C00"
+                  viewBox="0 0 16 16"
+                  style={{ marginBottom: "15px" }}
+                >
+                  <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 12A5 5 0 1 1 8 3a5 5 0 0 1 0 10zm-.93-7.588a.5.5 0 1 1 .858.514l-2 3a.5.5 0 0 1-.77.063l-1-1.2a.5.5 0 1 1 .74-.672l.647.776 1.525-2.38z"/>
+                </svg>
+                Seleccione una opción del menú
+              </div>
+            }
+          />
         </Routes>
       </div>
     </div>

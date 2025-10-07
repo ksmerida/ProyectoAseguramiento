@@ -7,7 +7,7 @@
 
 /* Contenedor principal ocupa todo el viewport para centrar contenido */
 html, body, #root {
-  height: 100%;
+  height: auto;
   width: 100%;
   margin: 0;
 }

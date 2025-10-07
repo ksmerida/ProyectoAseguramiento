@@ -429,20 +429,7 @@ def delete_order(db: Session, order_id: uuid.UUID):
         db.commit()
     return db_order
 
-# ----------------------------
-# Kitchen-specific Orders CRUD
-# ----------------------------
-def get_orders_by_status(db: Session, statuses: list) -> List[models.Order]:
-    return db.query(models.Order).filter(models.Order.status.in_(statuses)).all()
 
-def update_order_status(db: Session, order_id: uuid.UUID, status: str):
-    db_order = db.query(models.Order).filter(models.Order.id == order_id).first()
-    if not db_order:
-        return None
-    db_order.status = status
-    db.commit()
-    db.refresh(db_order)
-    return db_order
 
 # ----------------------------
 # OrderItems CRUD

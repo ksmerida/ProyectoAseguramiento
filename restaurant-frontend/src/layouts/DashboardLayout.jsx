@@ -101,7 +101,6 @@ export default function DashboardLayout() {
     { path: "inventory", label: "Inventario" },
     { path: "recipes", label: "Recetas" },
     { path: "orders", label: "Órdenes" },
-    { path: "cocina", label: "Cocina" },
   ];
 
   return (
