@@ -13,7 +13,7 @@ app = FastAPI(title="Restaurant API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://api-restaurante-h08h.onrender.com"],  # React frontend
+    allow_origins=["https://restaurante-wqur.onrender.com"],  # React frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
