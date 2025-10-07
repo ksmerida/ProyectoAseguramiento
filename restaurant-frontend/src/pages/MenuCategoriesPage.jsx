@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { colors } from "../theme";
 
-const apiUrl = "http://127.0.0.1:8000";
+const apiUrl = "https://api-restaurante-h08h.onrender.com";
 
 export default function MenuCategoriesPage() {
   const [categories, setCategories] = useState([]);
