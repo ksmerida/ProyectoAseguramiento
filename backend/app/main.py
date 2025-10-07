@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from backend.app.routers import (
+from app.routers import (
     auth, users, roles,
     customers, tables, table_status,
     reservations, menu_categories, menu_items,
