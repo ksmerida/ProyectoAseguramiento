@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://api-restaurante-h08h.onrender.com/";
 
 export async function login(username, password) {
   const formData = new URLSearchParams();
