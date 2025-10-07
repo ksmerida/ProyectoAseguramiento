@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from app import models, schemas
-from app.auth.hashing import Hasher
+from backend.app import models, schemas
+from backend.app.auth.hashing import Hasher
 from typing import List
 import uuid
 
