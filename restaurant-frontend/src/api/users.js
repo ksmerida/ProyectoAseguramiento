@@ -1,7 +1,7 @@
 // users.js
 import axios from "axios";
 
-const API_URL = "https://api-restaurante-h08h.onrender.com/"; // Cambia si tu backend está en otra URL
+const API_URL = "https://api-restaurante-h08h.onrender.com"; // Cambia si tu backend está en otra URL
 
 // Obtener todos los usuarios
 export const getUsers = async () => {
