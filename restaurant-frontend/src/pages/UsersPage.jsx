@@ -4,7 +4,7 @@ import { getUsers, createUser, updateUser, deleteUser } from "../api/users";
 import axios from "axios";
 import { colors } from "../theme";
 
-const apiUrl = "http://localhost:8000";
+const apiUrl = "https://api-restaurante-h08h.onrender.com";
 
 export default function UsersPage() {
   const queryClient = useQueryClient();
