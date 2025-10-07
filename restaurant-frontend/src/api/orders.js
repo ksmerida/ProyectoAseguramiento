@@ -1,7 +1,7 @@
 // orders.js
 import axios from "axios";
 
-const API_URL = "https://api-restaurante-h08h.onrender.com/"; // Cambiar según tu backend
+const API_URL = "https://api-restaurante-h08h.onrender.com"; // Cambiar según tu backend
 
 // Orders
 export const getOrders = async () => {
