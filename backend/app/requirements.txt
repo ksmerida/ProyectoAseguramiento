@@ -6,3 +6,5 @@ pydantic
 python-jose[cryptography]  # Para JWT
 passlib[bcrypt]             # Para encriptar contraseñas
 python-dotenv               # Para leer variables de entorno
+python-multipart
+argon2-cffi
