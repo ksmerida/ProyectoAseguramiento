@@ -5,11 +5,11 @@ from datetime import timedelta, datetime
 from pydantic import BaseModel
 from typing import Optional
 
-from backend.app import schemas, crud
-from backend.app.database import get_db
-from backend.app.auth.hashing import Hasher
-from backend.app.auth.jwt_handler import create_access_token, create_refresh_token, decode_token
-from backend.app.core.config import settings
+from app import schemas, crud
+from app.database import get_db
+from app.auth.hashing import Hasher
+from app.auth.jwt_handler import create_access_token, create_refresh_token, decode_token
+from app.core.config import settings
 
 router = APIRouter(
     prefix="/auth",
