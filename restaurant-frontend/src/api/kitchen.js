@@ -1,7 +1,7 @@
 // src/api/kitchen.js
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000"; // Cambiar según tu backend
+const API_URL = "https://api-restaurante-h08h.onrender.com/"; // Cambiar según tu backend
 
 // Obtener órdenes relevantes para cocina
 export const getKitchenOrders = async () => {
