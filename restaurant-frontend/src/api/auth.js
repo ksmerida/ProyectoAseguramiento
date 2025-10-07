@@ -2,7 +2,7 @@
 import axios from "axios";
 import qs from "qs";
 
-const API_URL = "https://api-restaurante-h08h.onrender.com/";
+const API_URL = "https://api-restaurante-h08h.onrender.com";
 
 export const login = async ({ username, password }) => {
   const response = await axios.post(
