@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from fastapi import HTTPException, status
-from app.core.config import settings
+from backend.app.core.config import settings
 
 # ========================
 # FUNCIONES DE JWT
