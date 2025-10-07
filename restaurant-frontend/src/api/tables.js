@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://api-restaurante-h08h.onrender.com/";
+const API_URL = "https://api-restaurante-h08h.onrender.com";
 
 // Mesas
 export const getTables = async () => {
