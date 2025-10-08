@@ -1,7 +1,7 @@
 // menuItems.js
 import axios from "axios";
 
-const API_URL = "https://api-restaurante-h08h.onrender.com";
+const API_URL = "https://proyectoaseguramiento-production.up.railway.app";
 
 // Obtener todos los menu items
 export const getMenuItems = async () => {
