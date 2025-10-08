@@ -1,4 +1,4 @@
-const API_URL = "https://proyectoaseguramiento-production.up.railway.app/";
+const API_URL = "https://proyectoaseguramiento-production.up.railway.app";
 
 export async function login(username, password) {
   const formData = new URLSearchParams();
